@@ -22,6 +22,8 @@ namespace GraphColoring
 
         private List<List<int>> tmpColors { get; set;}
 
+        //private List<int> curColor { get; set; }
+
         private int lvl = 0;
         private int curNumOfColors = 0;
 
@@ -31,14 +33,23 @@ namespace GraphColoring
             n = (int)Math.Sqrt(graph.Length);
             ResultGraph = null;
 
-            mainSupSet = CreateSupportSet(n);
-            lvlVariants = new List<Variants>();
+            bestColors = new List<List<int>>();
+            tmpColors = new List<List<int>>();
 
-            Build(lvlVariants.Last(), mainSupSet, new List<int>());
+
+            mainSupSet = CreateStartSupportSet(n);
+            lvlVariants = new List<Variants>();
             
+            //curColor = new List<int>();
+
+            lvlVariants.Add(Variants.CreateFromMatrix(n, Graph, mainSupSet));
+
+            if (mainSupSet.Count != 0)
+                Build(mainSupSet, new List<int>());            
         }
 
-        private List<int> CreateSupportSet(int n)
+
+        private List<int> CreateStartSupportSet(int n)
         {
             var result = new List<int>();
 
@@ -47,29 +58,80 @@ namespace GraphColoring
             return result;
         }
         
-
-        private void Build(Variants sets, List<int> uni, List<int> curTempSet)
+        private List<int> CreateSupportSet()
         {
-            if (uni.Count != 0)
+            var result = new List<int>(mainSupSet);
+
+            for(var i=0; i< tmpColors.Count; i++)
             {
-                if (lvl == 0)
+                result = result.Except(tmpColors[i]).ToList();
+            }
+
+            return null;
+        }
+        //построение с ненулевым множеством возможных продолжений
+        private void BuildNotNullVariants(Variants variants, List<int> uni, List<int> curTempSet)
+        {
+            for (var i=0; i<variants.SetOfPairs.Count; i++)
+            {
+                var node = variants.SetOfPairs[i];
+                var nextTempSet = new List<int>(curTempSet);
+
+                nextTempSet.Add(node.Left);
+                nextTempSet.Add(node.Right);
+
+                var nextUni = uni.Intersect(node.Set).ToList();
+
+                nextUni.Remove(node.Left);
+                nextUni.Remove(node.Right);
+
+                Build(nextUni, nextTempSet);
+            }
+        }
+
+        //построение с нулевым множеством возможных продолжений, при ненулевом опорным множеством
+        private void BuildEndByCenter(List<int> uni, List<int> curTempSet)
+        {
+            for (var i = 0; i < uni.Count; i++)
+            {
+                var nextTempSet = new List<int>(curTempSet);
+
+                nextTempSet.Add(uni[i]);
+
+                var nextUni = new List<int>(uni);
+                nextUni.Remove(uni[i]);
+
+                Build(nextUni, nextTempSet);
+            }
+        }
+
+        private void Build(List<int> uni, List<int> curTempSet)
+        {
+            var centrElements = new List<int>();
+
+            if(curTempSet.Count == 0)
+            {
+                uni = CreateSupportSet();
+            }
+
+            if (uni.Count == 0)
+            {
+                tmpColors.Add(curTempSet);
+            }
+            else
+            {
+                var variants = lvlVariants.Last();
+                
+                if (variants.Count != 0)
                 {
-                    var nextSupSet = uni.Except(curTempSet);
-
-                    if (curTempSet.Count == 0)
-                    {
-                        var variants = Variants.CreateFromMatrix(n, Graph, uni);
-
-                        if (variants.Count != 0)
-                        {
-                            foreach (var node in variants.SetOfPairs)
-                            {
-                                
-                            }
-                        }
-                    }
+                    BuildNotNullVariants(variants, uni, curTempSet);
+                }else
+                {
+                    BuildEndByCenter(uni, curTempSet);
                 }
+
             }
         }
     }
 }
+

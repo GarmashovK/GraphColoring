@@ -15,6 +15,11 @@ namespace GraphColoring.Models
         {
             SetOfPairs = new List<Pair>();
         }
+
+        public Variants(Variants toClone)
+        {
+            toClone.SetOfPairs.ForEach(pair => this.SetOfPairs.Add(new Pair(pair)));
+        }
         // создание вариантов перетановок по симметричной матрице графов и опорному множеству
         public static Variants CreateFromMatrix(int dim, bool[,] matrix, List<int> w)
         {
@@ -47,6 +52,48 @@ namespace GraphColoring.Models
             return result;
         }
 
-        
+        // просеивание по двум элементам
+        public Variants Sieve(int left, int right)
+        {
+            var result = new Variants(this);
+            for(var i=0; i<SetOfPairs.Count; i++)
+            {
+                var pair = new Pair(result.SetOfPairs[i]);
+
+                if (pair.Left != left && pair.Right != right)
+                {
+                    pair.Set.Remove(left);
+                    pair.Set.Remove(right);
+                }else
+                {
+                    result.SetOfPairs.Remove(pair);
+                    i--;
+                }
+            }
+
+            return result;
+        }
+
+        public Variants Sieve(List<int> supSet)
+        {
+            var result = new Variants(this);
+
+            for(var i=0; i< result.SetOfPairs.Count; i++)
+            {
+                var pair = result.SetOfPairs[i];
+
+                if (!supSet.Contains(pair.Left) ||
+                    !supSet.Contains(pair.Right))
+                {
+                    result.SetOfPairs.Remove(pair);
+                    i--;
+                }else
+                {
+                    pair.Set = pair.Set.Intersect(supSet).ToList();
+                }
+            }
+
+            return result;
+        }
     }
 }

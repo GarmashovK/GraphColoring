@@ -15,5 +15,13 @@ namespace GraphColoring.Models
         public List<int> Set { get; set; }
 
         public Pair() { }
+
+        public Pair(Pair toClone)
+        {
+            this.Left = toClone.Left;
+            this.Right = toClone.Right;
+
+            this.Set = new List<int>(toClone.Set);
+        }
     }
 }
