@@ -22,6 +22,12 @@ namespace GraphColoringConsole
             };
 
             var res = Variants.CreateFromMatrix(n, matrix, new int[] { 0, 1, 2, 3 }.ToList());
+            var tmp = "Hello";
+            if (true)
+            {
+                var list = new List<string>();
+                list.Add(tmp);
+            }
 
             Console.Read();
         }

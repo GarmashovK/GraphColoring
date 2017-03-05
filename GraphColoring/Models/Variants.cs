@@ -66,7 +66,7 @@ namespace GraphColoring.Models
                     pair.Set.Remove(right);
                 }else
                 {
-                    result.SetOfPairs.Remove(pair);
+                    result.SetOfPairs.RemoveAt(i);
                     i--;
                 }
             }
@@ -85,7 +85,7 @@ namespace GraphColoring.Models
                 if (!supSet.Contains(pair.Left) ||
                     !supSet.Contains(pair.Right))
                 {
-                    result.SetOfPairs.Remove(pair);
+                    result.SetOfPairs.RemoveAt(i);
                     i--;
                 }else
                 {
@@ -94,6 +94,19 @@ namespace GraphColoring.Models
             }
 
             return result;
+        }
+
+        public void Sift(List<int> supSet)
+        {
+            for (var i = 0; i < this.SetOfPairs.Count; i++)
+            {
+                var pair = this.SetOfPairs[i];
+                if (pair.Set.Except(supSet).Count() == 0)
+                {
+                    this.SetOfPairs.RemoveAt(i);
+                    i--;
+                }
+            }
         }
     }
 }
