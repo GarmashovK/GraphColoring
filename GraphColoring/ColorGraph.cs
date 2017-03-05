@@ -9,20 +9,25 @@ namespace GraphColoring
 {
     public class ColorGraph
     {
-        private bool[,] Graph {get;set;}
-        private int N{ get; set; }
-        public ColoredGraph ResultGraph { get; private set; }
+        public bool[,] ResultGraph { get; private set; }
+
+        public List<List<int>> ResultColorNodes { get; private set; }
+
+        public int ResultNumOfColors { get; private set; }
+
+        private bool[,] Graph;
+        private int N;
         //главное опорное множество (1,..n)
         private List<int> mainSupSet;
-        
+
         //Ds_ij для каждого уровня
-        private List<Variants> lvlVariants { get; set; }
+        private List<Variants> lvlVariants;
         //лучшая раскраска
-        private List<List<int>> bestColors { get; set; }
+        private List<List<int>> bestColors;
 
-        private List<List<int>> tmpColors { get; set;}
+        private List<List<int>> tmpColors;
 
-        private List<List<int>> watchedFirstBlocks { get; set; }
+        private List<List<int>> watchedFirstBlocks;
 
         //private List<int> curColor { get; set; }
         private int lvl = 0;
@@ -34,21 +39,43 @@ namespace GraphColoring
             ResultGraph = null;
             maxColors = N;
 
+            Init();
+
+            if (mainSupSet.Count != 0)
+            {
+                Build(null, new List<int>());
+
+                InitResult();
+            }
+        }
+
+        private void InitResult()
+        {
+            ResultColorNodes = bestColors;
+            ResultNumOfColors = bestColors.Count;
+            var tmp = new List<int>();
+            bestColors.ForEach(item => tmp = tmp.Intersect(item).ToList());
+
+            ResultGraph = new bool[N, N];
+
+            for(var i=0; i < N; i++)
+            {
+                for(var j=0; j<N; j++)
+                {
+                    ResultGraph[i, j] = Graph[tmp[i], tmp[j]];
+                }
+            }
+        }
+
+        private void Init()
+        {
             bestColors = new List<List<int>>();
             tmpColors = new List<List<int>>();
             watchedFirstBlocks = new List<List<int>>();
 
             mainSupSet = CreateStartSupportSet(N);
             lvlVariants = new List<Variants>();
-            
-            //curColor = new List<int>();
-            
-            lvl++;
-
-            if (mainSupSet.Count != 0)
-                Build(null, new List<int>());            
         }
-
 
         private List<int> CreateStartSupportSet(int n)
         {
@@ -71,27 +98,37 @@ namespace GraphColoring
             return null;
         }
 
-        private bool BlockCheckA(int lenOfMax, int uniLen)
+        private bool BlockCheckA(int curLvl, int lenOfMax, int uniLen)
         {
             return (double)tmpColors.Count + (double)uniLen / lenOfMax >= maxColors;
         }
 
-        private bool BlockCheckB(int ro)
+        private bool BlockCheckB(int curLvl,int ro)
         {
-            return tmpColors.Count * 2 + ro < Math.Round((double)N / maxColors);
+            return 2 * curLvl + ro < Math.Round((double)N / maxColors);
+        }
+
+        private bool BlockCheckC(int curLvl,int uniLen, int ro)
+        {
+            return 2 * curLvl + ro == uniLen;
         }
         //построение с ненулевым множеством возможных продолжений
         private void BuildNotNullVariants(Variants variants, List<int> uni, List<int> curTempSet)
         {
             var tmp = variants.SetOfPairs[0].Set.Count;
-            if (BlockCheckA(tmp != 0 ? tmp : 1, uni.Count))
+            var tmpRo = tmp != 0 ? tmp : 1;
+            if (BlockCheckA(curTempSet.Count / 2, tmpRo , uni.Count))
                 return;
 
             for (var i=0; i<variants.SetOfPairs.Count; i++)
             {
                 var node = variants.SetOfPairs[i];
 
-                if (BlockCheckB(node.Set.Count))
+                if (tmpColors.Count == 0
+                    && BlockCheckB(curTempSet.Count / 2, node.Set.Count)
+                    ||
+                    tmpColors.Count + 2 == maxColors
+                    && !BlockCheckC(curTempSet.Count / 2, uni.Count, tmpRo))
                     return;
 
                 var nextTempSet = new List<int>(curTempSet);
@@ -158,14 +195,7 @@ namespace GraphColoring
                 lvlVariants[lastVariants - i].Sift(phi);
             }
         }
-
-        private void BlockCheckC(List<int> uni)
-        {
-            var lastColor = tmpColors.Count;
-
-
-        }
-
+        
         private bool ColoringIsOver()
         {
             var count = 0;

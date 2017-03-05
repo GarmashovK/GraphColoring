@@ -40,7 +40,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\ColoredGraph.cs" />
     <Compile Include="ColorGraph.cs" />
     <Compile Include="Models\Pair.cs" />
     <Compile Include="Models\Variants.cs" />
