@@ -58,9 +58,9 @@ namespace GraphColoring
 
             ResultGraph = new bool[N, N];
 
-            for(var i=0; i < N; i++)
+            for (var i = 0; i < N; i++)
             {
-                for(var j=0; j<N; j++)
+                for (var j = 0; j < N; j++)
                 {
                     ResultGraph[i, j] = Graph[tmp[i], tmp[j]];
                 }
@@ -81,16 +81,16 @@ namespace GraphColoring
         {
             var result = new List<int>();
 
-            for(var i=0; i < n; i++) { result.Add(i); }
+            for (var i = 0; i < n; i++) { result.Add(i); }
 
             return result;
         }
-        
+
         private List<int> CreateSupportSet()
         {
             var result = new List<int>(mainSupSet);
 
-            for(var i=0; i< tmpColors.Count; i++)
+            for (var i = 0; i < tmpColors.Count; i++)
             {
                 result = result.Except(tmpColors[i]).ToList();
             }
@@ -103,12 +103,12 @@ namespace GraphColoring
             return (double)tmpColors.Count + (double)uniLen / lenOfMax >= maxColors;
         }
 
-        private bool BlockCheckB(int curLvl,int ro)
+        private bool BlockCheckB(int curLvl, int ro)
         {
             return 2 * curLvl + ro < Math.Round((double)N / maxColors);
         }
 
-        private bool BlockCheckC(int curLvl,int uniLen, int ro)
+        private bool BlockCheckC(int curLvl, int uniLen, int ro)
         {
             return 2 * curLvl + ro == uniLen;
         }
@@ -117,10 +117,10 @@ namespace GraphColoring
         {
             var tmp = variants.SetOfPairs[0].Set.Count;
             var tmpRo = tmp != 0 ? tmp : 1;
-            if (BlockCheckA(curTempSet.Count / 2, tmpRo , uni.Count))
+            if (BlockCheckA(curTempSet.Count / 2, tmpRo, uni.Count))
                 return;
 
-            for (var i=0; i<variants.SetOfPairs.Count; i++)
+            for (var i = 0; i < variants.SetOfPairs.Count; i++)
             {
                 var node = variants.SetOfPairs[i];
 
@@ -161,7 +161,7 @@ namespace GraphColoring
                 Build(nextUni, nextTempSet);
             }
         }
-        
+
         //Phi_js для прорежиания
         private List<int> GetPhi(int s)
         {
@@ -182,21 +182,21 @@ namespace GraphColoring
             }
             return result;
         }
-        
+
         //прореживание
         private void Thinning()
         {
             var lastColor = tmpColors.Last();
             var lastVariants = lvlVariants.Count;
-            
-            for (var i= 1; i < lastColor.Count; i++)
+
+            for (var i = 1; i < lastColor.Count; i++)
             {
                 var phi = GetPhi(i);
                 //удаляем полностью совпадающие ветви
                 lvlVariants[lastVariants - i].Sift(phi);
             }
         }
-        
+
         private bool ColoringIsOver()
         {
             var count = 0;
@@ -209,12 +209,12 @@ namespace GraphColoring
         {
             var centrElements = new List<int>();
 
-            if(curTempSet.Count == 0)
+            if (curTempSet.Count == 0)
             {
-                uni = CreateSupportSet();   
+                uni = CreateSupportSet();
             }
 
-             if (uni.Count == 0)
+            if (uni.Count == 0)
             {
                 tmpColors.Add(curTempSet);
 
@@ -223,7 +223,8 @@ namespace GraphColoring
                 if (!ColoringIsOver())
                 {
                     Build(CreateSupportSet(), new List<int>());
-                }else
+                }
+                else
                 {
                     if (bestColors.Count == 0 || tmpColors.Count < bestColors.Count)
                     {
@@ -236,7 +237,7 @@ namespace GraphColoring
                 CreateVariants(uni, curTempSet.Count == 0);
 
                 var variants = lvlVariants.Last();
-                
+
                 if (variants.Count != 0)
                 {
                     BuildNotNullVariants(variants, uni, curTempSet);
@@ -252,7 +253,7 @@ namespace GraphColoring
         private void CreateVariants(List<int> uni, bool newColor)
         {
             Variants result;
-            
+
             if (!newColor)
             {//Если не строится новый цвет то просеиваем из предыдущего
                 result = lvlVariants.Last().Sieve(uni);
@@ -264,6 +265,7 @@ namespace GraphColoring
                     lvlVariants.First().Sieve(uni) :
                     Variants.CreateFromMatrix(N, Graph, mainSupSet);
             }
+            result = result.SetOfPairs.OrderByDescending(item => item.Set.Count);
             //Добавляем в рассмотриваемые
             lvlVariants.Add(result);
         }
