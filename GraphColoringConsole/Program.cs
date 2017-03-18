@@ -1,4 +1,5 @@
-﻿using GraphColoring.Models;
+﻿using GraphColoring;
+using GraphColoring.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace GraphColoringConsole
         {
             int n = 4;
 
-            bool[,] matrix= new bool[,]
+            bool[,] matrix = new bool[,]
             {
                 {false,true,false,true },
                 {true,false,false,false },
@@ -21,14 +22,8 @@ namespace GraphColoringConsole
                 {true,false,true,false }
             };
 
-            var res = Variants.CreateFromMatrix(n, matrix, new int[] { 0, 1, 2, 3 }.ToList());
-            var tmp = "Hello";
-            if (true)
-            {
-                var list = new List<string>();
-                list.Add(tmp);
-            }
-
+            var colored = new ColorGraph(matrix);
+            
             Console.Read();
         }
     }

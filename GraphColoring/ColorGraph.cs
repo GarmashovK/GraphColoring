@@ -43,7 +43,7 @@ namespace GraphColoring
 
             if (mainSupSet.Count != 0)
             {
-                Build(null, new List<int>());
+                Build(new List<int>(), new List<int>());
 
                 InitResult();
             }
@@ -54,7 +54,7 @@ namespace GraphColoring
             ResultColorNodes = bestColors;
             ResultNumOfColors = bestColors.Count;
             var tmp = new List<int>();
-            bestColors.ForEach(item => tmp = tmp.Intersect(item).ToList());
+            bestColors.ForEach(item => tmp = tmp.Union(item).ToList());
 
             ResultGraph = new bool[N, N];
 
@@ -95,7 +95,7 @@ namespace GraphColoring
                 result = result.Except(tmpColors[i]).ToList();
             }
 
-            return null;
+            return result;
         }
 
         private bool BlockCheckA(int curLvl, int lenOfMax, int uniLen)
@@ -142,6 +142,7 @@ namespace GraphColoring
                 nextUni.Remove(node.Right);
 
                 Build(nextUni, nextTempSet);
+                lvlVariants.RemoveAt(lvlVariants.Count - 1);
             }
         }
 
@@ -210,10 +211,10 @@ namespace GraphColoring
 
             if(curTempSet.Count == 0)
             {
-                uni = CreateSupportSet();             
+                uni = CreateSupportSet();   
             }
 
-            if (uni.Count == 0)
+             if (uni.Count == 0)
             {
                 tmpColors.Add(curTempSet);
 
@@ -224,12 +225,9 @@ namespace GraphColoring
                     Build(CreateSupportSet(), new List<int>());
                 }else
                 {
-                    if (bestColors.Count != 0)
+                    if (bestColors.Count == 0 || tmpColors.Count < bestColors.Count)
                     {
-                        if (tmpColors.Count < bestColors.Count)
-                        {
-                            bestColors = new List<List<int>>(tmpColors);
-                        }
+                        bestColors = new List<List<int>>(tmpColors);
                     }
                 }
             }

@@ -18,7 +18,9 @@ namespace GraphColoring.Models
 
         public Variants(Variants toClone)
         {
-            toClone.SetOfPairs.ForEach(pair => this.SetOfPairs.Add(new Pair(pair)));
+            this.SetOfPairs = new List<Pair>();
+            toClone.SetOfPairs.ForEach(pair =>
+            this.SetOfPairs.Add(new Pair(pair)));
         }
         // создание вариантов перетановок по симметричной матрице графов и опорному множеству
         public static Variants CreateFromMatrix(int dim, bool[,] matrix, List<int> w)
