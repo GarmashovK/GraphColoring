@@ -8,7 +8,7 @@ namespace GraphColoring.Models
 {
     public class Variants
     {
-        public List<Pair> SetOfPairs { get; private set; }
+        public List<Pair> SetOfPairs { get; set; }
 
         public int Count { get { return SetOfPairs.Count; } }
         public Variants()

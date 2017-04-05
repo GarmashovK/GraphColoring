@@ -98,9 +98,10 @@ namespace GraphColoring
             return result;
         }
 
-        private bool BlockCheckA(int curLvl, int lenOfMax, int uniLen)
+        private bool BlockCheckA(int lenOfMax, int uniLen)
         {
-            return (double)tmpColors.Count + (double)uniLen / lenOfMax >= maxColors;
+            var val = (double)tmpColors.Count + (double)uniLen / lenOfMax;
+            return val >= maxColors;
         }
 
         private bool BlockCheckB(int curLvl, int ro)
@@ -117,18 +118,19 @@ namespace GraphColoring
         {
             var tmp = variants.SetOfPairs[0].Set.Count;
             var tmpRo = tmp != 0 ? tmp : 1;
-            if (BlockCheckA(curTempSet.Count / 2, tmpRo, uni.Count))
+            if (curTempSet.Count == 0 && 
+                BlockCheckA(tmpRo, uni.Count))
                 return;
 
             for (var i = 0; i < variants.SetOfPairs.Count; i++)
             {
                 var node = variants.SetOfPairs[i];
 
-                if (tmpColors.Count == 0
-                    && BlockCheckB(curTempSet.Count / 2, node.Set.Count)
+                if (tmpColors.Count == 0 &&
+                    BlockCheckB(curTempSet.Count / 2, node.Set.Count)
                     ||
-                    tmpColors.Count + 2 == maxColors
-                    && !BlockCheckC(curTempSet.Count / 2, uni.Count, tmpRo))
+                    tmpColors.Count - 1 == maxColors &&
+                    !BlockCheckC(curTempSet.Count / 2, uni.Count, tmpRo))
                     return;
 
                 var nextTempSet = new List<int>(curTempSet);
@@ -142,8 +144,8 @@ namespace GraphColoring
                 nextUni.Remove(node.Right);
 
                 Build(nextUni, nextTempSet);
-                lvlVariants.RemoveAt(lvlVariants.Count - 1);
             }
+            lvlVariants.RemoveAt(lvlVariants.Count - 1);
         }
 
         //построение с нулевым множеством возможных продолжений, 
@@ -160,6 +162,7 @@ namespace GraphColoring
 
                 Build(nextUni, nextTempSet);
             }
+            lvlVariants.RemoveAt(lvlVariants.Count - 1);
         }
 
         //Phi_js для прорежиания
@@ -186,10 +189,13 @@ namespace GraphColoring
         //прореживание
         private void Thinning()
         {
-            var lastColor = tmpColors.Last();
+            var lastColor = tmpColors.Last().Count / 2;
             var lastVariants = lvlVariants.Count;
 
-            for (var i = 1; i < lastColor.Count; i++)
+            if (lastVariants % 2 == 1)
+                lastColor++;
+
+            for (var i = 1; i <= lastColor; i++)
             {
                 var phi = GetPhi(i);
                 //удаляем полностью совпадающие ветви
@@ -219,7 +225,7 @@ namespace GraphColoring
                 tmpColors.Add(curTempSet);
 
                 Thinning();
-
+                
                 if (!ColoringIsOver())
                 {
                     Build(CreateSupportSet(), new List<int>());
@@ -229,8 +235,11 @@ namespace GraphColoring
                     if (bestColors.Count == 0 || tmpColors.Count < bestColors.Count)
                     {
                         bestColors = new List<List<int>>(tmpColors);
+                        maxColors = bestColors.Count;
+                        tmpColors.RemoveAt(tmpColors.Count - 1);
                     }
                 }
+                tmpColors.Remove(curTempSet);
             }
             else
             {
@@ -246,7 +255,6 @@ namespace GraphColoring
                 {
                     BuildEndByCenter(uni, curTempSet);
                 }
-
             }
         }
 
@@ -265,7 +273,7 @@ namespace GraphColoring
                     lvlVariants.First().Sieve(uni) :
                     Variants.CreateFromMatrix(N, Graph, mainSupSet);
             }
-            result = result.SetOfPairs.OrderByDescending(item => item.Set.Count);
+            result.SetOfPairs = result.SetOfPairs.OrderByDescending(item => item.Set.Count).ToList();
             //Добавляем в рассмотриваемые
             lvlVariants.Add(result);
         }
