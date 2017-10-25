@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphColoring", "GraphColoring\GraphColoring.csproj", "{8E453478-2B61-4F27-AF20-7D22B2F9717B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphColoringConsole", "GraphColoringConsole\GraphColoringConsole.csproj", "{63A241CF-AB76-4128-B65B-B15A27F33AF6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphColoringTests", "GraphColoringTests\GraphColoringTests.csproj", "{51CB1E1F-14E9-47BD-8772-E3C56956ADDA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{63A241CF-AB76-4128-B65B-B15A27F33AF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{63A241CF-AB76-4128-B65B-B15A27F33AF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{63A241CF-AB76-4128-B65B-B15A27F33AF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51CB1E1F-14E9-47BD-8772-E3C56956ADDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51CB1E1F-14E9-47BD-8772-E3C56956ADDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51CB1E1F-14E9-47BD-8772-E3C56956ADDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51CB1E1F-14E9-47BD-8772-E3C56956ADDA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
