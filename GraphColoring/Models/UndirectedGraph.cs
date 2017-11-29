@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,10 +9,10 @@ namespace GraphColoring {
     public class UndirectedGraph {
         public int NumOfVertices { get; private set; }
         public List<int> VerticesNames { get; private set; }
-        public bool[,] _graph { get; private set; }
+        public bool[,] AdjecencyMatrix { get; private set; }
 
         public UndirectedGraph(int verticesCount, bool[,] graph, List<int> names) {
-            this._graph = (bool[,])graph.Clone();
+            this.AdjecencyMatrix = (bool[,])graph.Clone();
             NumOfVertices = verticesCount;
             VerticesNames = names;
         }
@@ -19,7 +20,7 @@ namespace GraphColoring {
         public UndirectedGraph(int verticesCount, bool[,] graph, int[] names) {
             if (graph.Length / verticesCount != verticesCount || names.Length != verticesCount)
                 throw new Exception("Number of peaks is not equal with the graph demension!");
-            this._graph = (bool[,])graph.Clone();
+            this.AdjecencyMatrix = (bool[,])graph.Clone();
             NumOfVertices = verticesCount;
             VerticesNames = names.ToList();
         }
@@ -27,7 +28,7 @@ namespace GraphColoring {
         public UndirectedGraph(int verticesCount, bool[,] graph) {
             if (graph.Length / verticesCount != verticesCount)
                 throw new Exception("Number of peaks is not equal with the graph demension!");
-            this._graph = (bool[,])graph.Clone();
+            this.AdjecencyMatrix = (bool[,])graph.Clone();
             NumOfVertices = verticesCount;
             VerticesNames = GetStandartNames(NumOfVertices);
         }
@@ -45,14 +46,14 @@ namespace GraphColoring {
             int maxNumOfPeaks = (int)(verticesCount * (verticesCount - 1) / 2);
             int edgesNum = Convert.ToInt32(Math.Round(edgeDensity * maxNumOfPeaks));
 
-            _graph = GetEmptyGraph(NumOfVertices);
+            AdjecencyMatrix = GetEmptyGraph(NumOfVertices);
 
             var edges = GetAllPossibleEdges();
             var rand = new Random();
 
             for (var i = 0; i < edgesNum; i++) {
                 int pos = rand.Next(edges.Count);
-                _graph[edges[pos].Key, edges[pos].Value] = _graph[edges[pos].Value, edges[pos].Key] = true;
+                AdjecencyMatrix[edges[pos].Key, edges[pos].Value] = AdjecencyMatrix[edges[pos].Value, edges[pos].Key] = true;
                 edges.RemoveAt(pos);
             }
         }
@@ -91,7 +92,7 @@ namespace GraphColoring {
             //result += "\n";
             for (var i = 0; i < NumOfVertices; i++) {
                 for (var j = 0; j < NumOfVertices; j++) {
-                    result += _graph[i, j] ? 1 : 0;
+                    result += AdjecencyMatrix[i, j] ? 1 : 0;
                 }
                 if (i != NumOfVertices - 1) result += "\n";
             }
@@ -116,7 +117,7 @@ namespace GraphColoring {
                 foreach (var i in foundPeaks) {
                     colCount = 0;
                     foreach (var j in foundPeaks)
-                        tmpGraph[strCount, colCount++] = _graph[i, j];
+                        tmpGraph[strCount, colCount++] = AdjecencyMatrix[i, j];
                     strCount++;
                 }
                 components.Add(new UndirectedGraph(foundPeaks.Length, tmpGraph, GetNamesAtPositions(foundPeaks)));
@@ -149,7 +150,7 @@ namespace GraphColoring {
                 peaks.Add(u);
 
                 for (var i = 0; i < n; i++) {
-                    if (_graph[u, i] && !traversal[i]) {
+                    if (AdjecencyMatrix[u, i] && !traversal[i]) {
                         stack.Push(i);
                         traversal[i] = true;
                     }
@@ -166,18 +167,18 @@ namespace GraphColoring {
             for (var i = 0; i < VerticesNames.Count && check < 2; i++)
                 if (VerticesNames[i] == a) { posA = i; check++; } else if (VerticesNames[i] == b) { posB = i; check++; }
 
-            return _graph[posA, posB];
+            return AdjecencyMatrix[posA, posB];
         }
 
         public override bool Equals(object obj) {
             var other = (UndirectedGraph)obj;
-            if (other._graph.Length != this._graph.Length)
+            if (other.AdjecencyMatrix.Length != this.AdjecencyMatrix.Length)
                 return false;
             var n = this.NumOfVertices;
 
             for (var i = 0; i < n; i++) {
                 for (var j = 0; j < n; j++) {
-                    if (other._graph[i, j] != this._graph[i, j])
+                    if (other.AdjecencyMatrix[i, j] != this.AdjecencyMatrix[i, j])
                         return false;
                 }
             }
@@ -199,7 +200,7 @@ namespace GraphColoring {
                 var posV = GetPosByName(v);
                 for (var i = 0; i < set.Count; i++) {
                     var posU = GetPosByName(set[i]);
-                    if (_graph[posV, posU]) return false;
+                    if (AdjecencyMatrix[posV, posU]) return false;
                 }
                 return true;
             };
@@ -311,7 +312,7 @@ namespace GraphColoring {
             var posV = GetPosByName(v);
             for (var i = 0; i < NumOfVertices; i++) {
                 if (i == posV) continue;
-                if (_graph[i, posV]) result.Add(VerticesNames[i]);
+                if (AdjecencyMatrix[i, posV]) result.Add(VerticesNames[i]);
             }
             return result;
         }
@@ -328,7 +329,7 @@ namespace GraphColoring {
         public void Complement() {
             for (var i = 0; i < NumOfVertices; i++) {
                 for (var j = i + 1; j < NumOfVertices; j++) {
-                    _graph[i, j] = _graph[j, i] = !_graph[i, j];
+                    AdjecencyMatrix[i, j] = AdjecencyMatrix[j, i] = !AdjecencyMatrix[i, j];
                 }
             }
         }
@@ -339,7 +340,7 @@ namespace GraphColoring {
 
             for (var i = 0; i < this.NumOfVertices; i++) {
                 for (var j = i + 1; j < this.NumOfVertices; j++) {
-                    _newGraph[i, j] = _newGraph[j, i] = this._graph[i, j];
+                    _newGraph[i, j] = _newGraph[j, i] = this.AdjecencyMatrix[i, j];
                 }
             }
 
@@ -347,7 +348,7 @@ namespace GraphColoring {
                 for (var j = i + 1; j < other.NumOfVertices; j++) {
                     _newGraph[i + this.NumOfVertices, j + this.NumOfVertices]
                         = _newGraph[j + this.NumOfVertices, i + this.NumOfVertices]
-                        = other._graph[i, j];
+                        = other.AdjecencyMatrix[i, j];
                 }
             }
 
@@ -368,7 +369,7 @@ namespace GraphColoring {
                     while (!verInter.Contains(this.VerticesNames[tmpJ1])) tmpJ1++;
                     while (!verInter.Contains(other.VerticesNames[tmpJ2])) tmpJ2++;
 
-                    result[i, j] = result[j, i] = this._graph[tmpI1, tmpJ1] & other._graph[tmpI2, tmpJ2];
+                    result[i, j] = result[j, i] = this.AdjecencyMatrix[tmpI1, tmpJ1] & other.AdjecencyMatrix[tmpI2, tmpJ2];
                 }
             }
             return new UndirectedGraph(verInter.Length, result, verInter);
@@ -384,7 +385,7 @@ namespace GraphColoring {
             int pos1 = getPos(from),
                 pos2 = getPos(to);
 
-            _graph[pos1, pos2] = _graph[pos2, pos1] = false;
+            AdjecencyMatrix[pos1, pos2] = AdjecencyMatrix[pos2, pos1] = false;
         }
 
         public void RemoveVertice(int name) {
@@ -409,13 +410,13 @@ namespace GraphColoring {
                 }
                 for (var j = i + 1; j < NumOfVertices; j++) {
                     if (j >= pos) tempH = 1;
-                    _newGraph[i - tempV, j - tempH] = _newGraph[j - tempH, i - tempV] = _graph[i, j];
+                    _newGraph[i - tempV, j - tempH] = _newGraph[j - tempH, i - tempV] = AdjecencyMatrix[i, j];
                 }
                 _newGraph[i - tempV, i - tempV] = false;
             }
 
             NumOfVertices--;
-            _graph = _newGraph;
+            AdjecencyMatrix = _newGraph;
         }
 
         public UndirectedGraph RemoveVertices(IList<int> vertices) {
@@ -426,8 +427,8 @@ namespace GraphColoring {
 
             for (var i = 0; i < tmpNames.Count; i++) {
                 for (var j = i + 1; j < tmpNames.Count; j++) {
-                    matrix[i, j] = _graph[positions[i], positions[j]];
-                    matrix[j, i] = _graph[positions[i], positions[j]];
+                    matrix[i, j] = AdjecencyMatrix[positions[i], positions[j]];
+                    matrix[j, i] = AdjecencyMatrix[positions[i], positions[j]];
                 }
             }
 
@@ -451,7 +452,7 @@ namespace GraphColoring {
 
             for (var i = 0; i < graph1.NumOfVertices; i++) {
                 for (var j = i + 1; j < graph1.NumOfVertices; j++) {
-                    _newGraph[i, j] = _newGraph[j, i] = graph1._graph[i, j];
+                    _newGraph[i, j] = _newGraph[j, i] = graph1.AdjecencyMatrix[i, j];
                 }
                 _newGraph[i, i] = false;
             }
@@ -460,7 +461,7 @@ namespace GraphColoring {
                 for (var j = i + 1; j < graph2.NumOfVertices; j++) {
                     _newGraph[i + graph1.NumOfVertices, j + graph1.NumOfVertices]
                         = _newGraph[j + graph1.NumOfVertices, i + graph1.NumOfVertices]
-                        = graph2._graph[i, j];
+                        = graph2.AdjecencyMatrix[i, j];
                 }
                 _newGraph[i + graph1.NumOfVertices, i + graph1.NumOfVertices] = false;
             }
@@ -473,8 +474,8 @@ namespace GraphColoring {
 
             return new UndirectedGraph(len, _newGraph);
         }
-        
-        public List<List<int>> GetChromaticNumber() {
+
+        public List<List<int>> GetMISChromaticNumber() {
             var result = new List<List<int>>();
             var tmp = new List<List<int>>();
             var max = NumOfVertices;
@@ -483,9 +484,9 @@ namespace GraphColoring {
 
             chromaticFunc =
                 (G) => {
-                    var all_IS = G.MIS();
-                    
-                    if (all_IS.Count == 0) {
+                    var all_MIS = G.MIS();
+
+                    if (all_MIS.Count == 0) {
                         if (tmp.Count < max) {
                             result = new List<List<int>>(tmp);
                             max = result.Count;
@@ -493,7 +494,7 @@ namespace GraphColoring {
                         }
                     }
 
-                    foreach(List<int> IS in all_IS) {
+                    foreach (List<int> IS in all_MIS) {
                         tmp.Add(IS);
                         chromaticFunc(G.RemoveVertices(IS));
                         tmp.RemoveAt(tmp.Count - 1);
@@ -501,6 +502,76 @@ namespace GraphColoring {
                 };
 
             chromaticFunc(this);
+
+            return result;
+        }
+
+        public List<List<int>> GetOlemskoyChromaticNumber() {
+            var olemGraph = new OlemskoyColorGraph(this.AdjecencyMatrix);
+            
+            return olemGraph.ResultColorNodes;
+        }
+
+        private IList<int> BuildPermutation(List<List<int>> colored) {
+            var tmp = new List<int>();
+
+            foreach (List<int> color in colored) {
+                tmp.AddRange(color);
+            }
+
+            return GetPositions(tmp);
+        }
+
+        private string PrintColors(List<List<int>> coloredV) {
+            var result = "";
+            result += string.Format("Кол-во цветов: {0}\n", coloredV.Count);
+
+            result += "Раскраска: \n";
+
+            for (var i = 0; i < coloredV.Count; i++) {
+                result += string.Format("{0} - ", i + 1);
+
+                for (var j = 0; j < coloredV[i].Count; j++) {
+                    result += string.Format("{0} ", coloredV[i][j]);
+                }
+                result += "\n";
+            }
+
+            return result;
+        }
+
+        private string PrintGraph(bool[,] graph) {
+            string result = "";
+            var n = NumOfVertices;
+            
+            result = ("Граф: \n");
+
+            for (var i = 0; i < n; i++) {
+                for (var j = 0; j < n; j++) {
+                    result += string.Format("{0} ", graph[i, j] ? 1 : 0);
+                }
+                result += "\n";
+            }
+
+            return result;
+        }
+
+        public string OutColoredGraph(List<List<int>> coloredV) {
+            var result = "";
+            var permutation = BuildPermutation(coloredV);
+            var n = NumOfVertices;
+            var tmp = new bool[n, n];
+
+
+            for (var i = 0; i < n; i++) {
+                for (var j = 0; j < n; j++) {
+                    tmp[i, j] = AdjecencyMatrix[permutation[i], permutation[j]];
+                }
+            }
+
+            result += PrintColors(coloredV);
+            result += PrintGraph(tmp);
+
 
             return result;
         }

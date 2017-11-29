@@ -7,33 +7,35 @@ namespace GraphColoringTests {
     public class UndirectedGraphTests {
         [TestMethod]
         public void TestMISColoring() {
-            bool[,] matrix = new bool[,]
-            {
-                {false,false,false,false,false,true,true,false,false,true,false,true,false,false,false,true },
-                {false,false,false,false,false,true,true,true,false,false,false,false,true,false,false,true },
-                {false,false,false,false,false,false,true,true,true,false,false,false,false,true,false,true },
-                {false,false,false,false,false,false,false,true,true,true,false,false,false,false,true,true },
-                {false,false,false,false,false,true,false,false,true,true,true,false,false,false,false,true },
-                {true,true,false,false,true,false,false,false,false,false,false,false,false,true,false,false },
-                {true,true,true,false,false,false,false,false,false,false,false,false,false,false,true,false },
-                {false,true,true,true,false,false,false,false,false,false,true,false,false,false,false,false },
-                {false,false,true,true,true,false,false,false,false,false,false,true,false,false,false,false },
-                {true,false,false,true,true,false,false,false,false,false,false,false,true,false,false,false },
-                {false,false,false,false,true,false,false,true,false,false,false,true,false,false,true,false },
-                {true,false,false,false,false,false,false,false,true,false,true,false,true,false,false,false },
-                {false,true,false,false,false,false,false,false,false,true,false,true,false,true,false,false },
-                {false,false,true,false,false,true,false,false,false,false,false,false,true,false,true,false },
-                {false,false,false,true,false,false,true,false,false,false,true,false,false,true,false,false },
-                {true,true,true,true,true,false,false,false,false,false,false,false,false,false,false,false }
-            };
-            int n = (int)Math.Sqrt((double)matrix.Length);
+            int n = 25;
+            bool[,] matrix = GraphGenerator.GenerateByDensity(n, 0.5);
+            //bool[,] matrix = new bool[,]
+            //{
+            //    {false,false,false,false,false,true,true,false,false,true,false,true,false,false,false,true },
+            //    {false,false,false,false,false,true,true,true,false,false,false,false,true,false,false,true },
+            //    {false,false,false,false,false,false,true,true,true,false,false,false,false,true,false,true },
+            //    {false,false,false,false,false,false,false,true,true,true,false,false,false,false,true,true },
+            //    {false,false,false,false,false,true,false,false,true,true,true,false,false,false,false,true },
+            //    {true,true,false,false,true,false,false,false,false,false,false,false,false,true,false,false },
+            //    {true,true,true,false,false,false,false,false,false,false,false,false,false,false,true,false },
+            //    {false,true,true,true,false,false,false,false,false,false,true,false,false,false,false,false },
+            //    {false,false,true,true,true,false,false,false,false,false,false,true,false,false,false,false },
+            //    {true,false,false,true,true,false,false,false,false,false,false,false,true,false,false,false },
+            //    {false,false,false,false,true,false,false,true,false,false,false,true,false,false,true,false },
+            //    {true,false,false,false,false,false,false,false,true,false,true,false,true,false,false,false },
+            //    {false,true,false,false,false,false,false,false,false,true,false,true,false,true,false,false },
+            //    {false,false,true,false,false,true,false,false,false,false,false,false,true,false,true,false },
+            //    {false,false,false,true,false,false,true,false,false,false,true,false,false,true,false,false },
+            //    {true,true,true,true,true,false,false,false,false,false,false,false,false,false,false,false }
+            //};
+            //int n = (int)Math.Sqrt((double)matrix.Length);
 
             Console.WriteLine("Graph is being colored...");
             var graph = new UndirectedGraph(n, matrix);
 
             var start = DateTime.Now;
 
-            var colored = graph.GetChromaticNumber();
+            var colored = graph.GetMISChromaticNumber();
 
             var time = DateTime.Now - start;
         }
@@ -117,7 +119,7 @@ namespace GraphColoringTests {
 
             for (var i=0; i<l; i++) {
                 for (var j = 0; j < l; j++) {
-                    check &= result._graph[i, j] == resultCheck[i, j];
+                    check &= result.AdjecencyMatrix[i, j] == resultCheck[i, j];
                 }
             }
 

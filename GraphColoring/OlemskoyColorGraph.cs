@@ -55,18 +55,6 @@ namespace GraphColoring
         {
             ResultColorNodes = bestColors;
             ResultNumOfColors = bestColors.Count;
-            var tmp = new List<int>();
-            bestColors.ForEach(item => tmp = tmp.Union(item).ToList());
-
-            ResultGraph = new bool[N, N];
-
-            for (var i = 0; i < N; i++)
-            {
-                for (var j = 0; j < N; j++)
-                {
-                    ResultGraph[i, j] = Graph[tmp[i], tmp[j]];
-                }
-            }
         }
 
         private void Init()
