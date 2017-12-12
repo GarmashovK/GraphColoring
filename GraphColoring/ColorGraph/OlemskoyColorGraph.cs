@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GraphColoring
+namespace GraphColoring.ColorGraph
 {
     public class OlemskoyColorGraph
     {
