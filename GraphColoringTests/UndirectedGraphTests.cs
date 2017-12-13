@@ -7,7 +7,7 @@ namespace GraphColoringTests {
     public class UndirectedGraphTests {
         [TestMethod]
         public void TestMISColoring() {
-            int n = 25;
+            int n = 20;
             bool[,] matrix = GraphGenerator.GenerateByDensity(n, 0.5);
             //bool[,] matrix = new bool[,]
             //{

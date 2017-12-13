@@ -4,31 +4,33 @@ using System;
 namespace GraphColoringConsole {
     class Program {
         static void Main(string[] args) {
-            //int n = 25;
-            //bool[,] matrix = GraphGenerator.GenerateByDensity(n, 0.3);
+            int n = 10;
+            bool[,] matrix = GraphGenerator.GenerateByDensity(n, 0.3);
 
-            bool[,] matrix = new bool[,]
-            {
-                {false,false,false,false,false,true,true,false,false,true,false,true,false,false,false,true },
-                {false,false,false,false,false,true,true,true,false,false,false,false,true,false,false,true },
-                {false,false,false,false,false,false,true,true,true,false,false,false,false,true,false,true },
-                {false,false,false,false,false,false,false,true,true,true,false,false,false,false,true,true },
-                {false,false,false,false,false,true,false,false,true,true,true,false,false,false,false,true },
-                {true,true,false,false,true,false,false,false,false,false,false,false,false,true,false,false },
-                {true,true,true,false,false,false,false,false,false,false,false,false,false,false,true,false },
-                {false,true,true,true,false,false,false,false,false,false,true,false,false,false,false,false },
-                {false,false,true,true,true,false,false,false,false,false,false,true,false,false,false,false },
-                {true,false,false,true,true,false,false,false,false,false,false,false,true,false,false,false },
-                {false,false,false,false,true,false,false,true,false,false,false,true,false,false,true,false },
-                {true,false,false,false,false,false,false,false,true,false,true,false,true,false,false,false },
-                {false,true,false,false,false,false,false,false,false,true,false,true,false,true,false,false },
-                {false,false,true,false,false,true,false,false,false,false,false,false,true,false,true,false },
-                {false,false,false,true,false,false,true,false,false,false,true,false,false,true,false,false },
-                {true,true,true,true,true,false,false,false,false,false,false,false,false,false,false,false }
-            };
-            int n = (int)Math.Sqrt((double)matrix.Length);
+            //bool[,] matrix = new bool[,]
+            //{
+            //    {false,false,false,false,false,true,true,false,false,true,false,true,false,false,false,true },
+            //    {false,false,false,false,false,true,true,true,false,false,false,false,true,false,false,true },
+            //    {false,false,false,false,false,false,true,true,true,false,false,false,false,true,false,true },
+            //    {false,false,false,false,false,false,false,true,true,true,false,false,false,false,true,true },
+            //    {false,false,false,false,false,true,false,false,true,true,true,false,false,false,false,true },
+            //    {true,true,false,false,true,false,false,false,false,false,false,false,false,true,false,false },
+            //    {true,true,true,false,false,false,false,false,false,false,false,false,false,false,true,false },
+            //    {false,true,true,true,false,false,false,false,false,false,true,false,false,false,false,false },
+            //    {false,false,true,true,true,false,false,false,false,false,false,true,false,false,false,false },
+            //    {true,false,false,true,true,false,false,false,false,false,false,false,true,false,false,false },
+            //    {false,false,false,false,true,false,false,true,false,false,false,true,false,false,true,false },
+            //    {true,false,false,false,false,false,false,false,true,false,true,false,true,false,false,false },
+            //    {false,true,false,false,false,false,false,false,false,true,false,true,false,true,false,false },
+            //    {false,false,true,false,false,true,false,false,false,false,false,false,true,false,true,false },
+            //    {false,false,false,true,false,false,true,false,false,false,true,false,false,true,false,false },
+            //    {true,true,true,true,true,false,false,false,false,false,false,false,false,false,false,false }
+            //};
+            //int n = (int)Math.Sqrt((double)matrix.Length);
             var graph = new UndirectedGraph(n, matrix);
 
+            Console.WriteLine(graph.PrintGraph(matrix));
+            
             Console.WriteLine("MIS alg");
 
             var start = DateTime.Now;

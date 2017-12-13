@@ -42,7 +42,9 @@
   <ItemGroup>
     <Compile Include="ColorGraph\BinaryOlemskoyColorGraph.cs" />
     <Compile Include="GraphGenerator.cs" />
+    <Compile Include="Models\Bin\BinaryPair.cs" />
     <Compile Include="Models\Bin\BinarySet.cs" />
+    <Compile Include="Models\Bin\BinaryVariants.cs" />
     <Compile Include="Models\Graph.cs" />
     <Compile Include="Models\UndirectedGraph.cs" />
     <Compile Include="ColorGraph\OlemskoyColorGraph.cs" />

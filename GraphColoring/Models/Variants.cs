@@ -60,7 +60,7 @@ namespace GraphColoring.Models
             var result = new Variants(this);
             for(var i=0; i<SetOfPairs.Count; i++)
             {
-                var pair = new Pair(result.SetOfPairs[i]);
+                var pair = result.SetOfPairs[i];
 
                 if (pair.Left != left && pair.Right != right)
                 {

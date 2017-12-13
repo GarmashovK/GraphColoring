@@ -523,7 +523,7 @@ namespace GraphColoring {
             return GetPositions(tmp);
         }
 
-        private string PrintColors(List<List<int>> coloredV) {
+        public string PrintColors(List<List<int>> coloredV) {
             var result = "";
             result += string.Format("Кол-во цветов: {0}\n", coloredV.Count);
 
@@ -541,7 +541,7 @@ namespace GraphColoring {
             return result;
         }
 
-        private string PrintGraph(bool[,] graph) {
+        public string PrintGraph(bool[,] graph) {
             string result = "";
             var n = NumOfVertices;
             

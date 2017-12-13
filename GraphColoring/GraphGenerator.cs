@@ -19,22 +19,20 @@ namespace GraphColoring {
         }
 
         public static bool[,] GenerateByDensity(int n, double density) {
-            var numOfEdges = n * (n - 1) / 2 - n;
-            var max =(int)(density * numOfEdges);
-            var count = 0;
-
             var result = new bool[n, n];
             var selection = GetPossibleVertexes(n);
             var random = new Random(DateTime.Now.Millisecond);
+            var numOfEdges = (int)(density * selection.Count);
 
-            while (count != max) {
-                var num = random.Next(0, numOfEdges);
+            while (numOfEdges != 0) {
+                var num = random.Next(selection.Count);
                 var elem = selection.ElementAt(num);
 
                 result[elem.Key, elem.Value] = true;
                 result[elem.Value, elem.Key] = true;
 
                 selection.RemoveAt(num);
+                numOfEdges--;
             }
 
             return result;
