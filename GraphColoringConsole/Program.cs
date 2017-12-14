@@ -4,7 +4,7 @@ using System;
 namespace GraphColoringConsole {
     class Program {
         static void Main(string[] args) {
-            int n = 10;
+            int n = 13;
             bool[,] matrix = GraphGenerator.GenerateByDensity(n, 0.3);
 
             //bool[,] matrix = new bool[,]

@@ -97,7 +97,7 @@ namespace GraphColoring.ColorGraph
 
         private bool BlockCheckB(int curLvl, int ro)
         {
-            return 2 * (curLvl - 1) + ro < Math.Round((double)N / maxColors);
+            return 2 * (curLvl - 1) + ro < N / maxColors;
         }
 
         private bool BlockCheckC(int curLvl, int uniLen, int ro)
@@ -106,31 +106,38 @@ namespace GraphColoring.ColorGraph
         }
 
 
-        private int GetRo(Variants variants)
+        private int GetRo(Variants variants, Pair pair)
         {
-            var tmp = variants.SetOfPairs[0].Set.Count;
+            if (variants.Count == 0) return 1;
+            int tmp = pair.Set.Count;
             return tmp != 0 ? tmp : 1;
         }
 
         //построение с ненулевым множеством возможных продолжений
         private void BuildNotNullVariants(Variants variants, List<int> uni, List<int> curTempSet)
         {
-            var tmpRo = GetRo(variants);
-            var lvl = curTempSet.Count / 2;
+            var lvl = curTempSet.Count / 2 + 1;
+            var isFirstLvl = curTempSet.Count == 0;
+            var tmpRo = GetRo(variants, null);
 
-            if (curTempSet.Count == 0 && 
-                BlockCheckA(tmpRo, uni.Count))
-                return;            
+            if (curTempSet.Count == 0 &&
+                    uni.Count / tmpRo >= maxColors)
+                return;
 
-            for (var i= 0 ;i < variants.SetOfPairs.Count; i++ )
-            {
-                var node = variants.SetOfPairs[i];
+            while (variants.SetOfPairs.Count != 0) {
+                var node = variants.SetOfPairs.First();
+                tmpRo = GetRo(variants, node);
+                if (isFirstLvl &&
+                    BlockCheckA(tmpRo, uni.Count))
+                    return;
 
                 if (tmpColors.Count == 0 &&
-                    BlockCheckB(lvl, node.Set.Count)
-                    ||
-                    tmpColors.Count - 1 == maxColors &&
-                    !BlockCheckC(curTempSet.Count / 2, uni.Count, tmpRo))
+                BlockCheckB(lvl, node.Set.Count)
+                ||
+                tmpColors.Count + 2 == maxColors &&
+                !BlockCheckC(curTempSet.Count / 2, uni.Count, tmpRo)
+                || isFirstLvl && tmpColors.Count == 0 &&
+                    BlockCheckD(tmpRo))
                     return;
 
                 var nextTempSet = new List<int>(curTempSet);
@@ -144,6 +151,8 @@ namespace GraphColoring.ColorGraph
                 nextUni.Remove(node.Right);
 
                 Build(nextUni, nextTempSet);
+                variants.SetOfPairs.Remove(node);
+
                 if (IsOver) return;
             }
         }
@@ -212,11 +221,10 @@ namespace GraphColoring.ColorGraph
             return count == N;
         }
 
-        private bool BlockCheckD()
+        private bool BlockCheckD(int ro)
         {
             if (tmpColors[0].Count < 2) return false;
             
-            var ro = GetRo(lvlVariants.FirstOrDefault());
             var tmp1 = N / ro;
             var tmp2 = (double)N / ro;
             
@@ -233,6 +241,7 @@ namespace GraphColoring.ColorGraph
         //построение дерева перебора
         private void Build(List<int> uni, List<int> curTempSet)
         {
+            if (IsOver) return;
             var centrElements = new List<int>();
 
             if (curTempSet.Count == 0)
@@ -252,18 +261,10 @@ namespace GraphColoring.ColorGraph
                 }
                 else
                 {
-                    var ro = GetRo(lvlVariants.ElementAt(1));
-                    
                     if (bestColors.Count == 0 || tmpColors.Count < bestColors.Count)
                     {
                         bestColors = new List<List<int>>(tmpColors);
                         maxColors = bestColors.Count;
-                        tmpColors.RemoveAt(tmpColors.Count - 1);
-                    }
-
-                    if (BlockCheckD())
-                    {
-                        IsOver = true;
                     }
                 }
                 tmpColors.Remove(curTempSet);

@@ -7,70 +7,24 @@ namespace GraphColoringTests {
     public class UndirectedGraphTests {
         [TestMethod]
         public void TestMISColoring() {
-            int n = 20;
+            int n = 10;
             bool[,] matrix = GraphGenerator.GenerateByDensity(n, 0.5);
-            //bool[,] matrix = new bool[,]
-            //{
-            //    {false,false,false,false,false,true,true,false,false,true,false,true,false,false,false,true },
-            //    {false,false,false,false,false,true,true,true,false,false,false,false,true,false,false,true },
-            //    {false,false,false,false,false,false,true,true,true,false,false,false,false,true,false,true },
-            //    {false,false,false,false,false,false,false,true,true,true,false,false,false,false,true,true },
-            //    {false,false,false,false,false,true,false,false,true,true,true,false,false,false,false,true },
-            //    {true,true,false,false,true,false,false,false,false,false,false,false,false,true,false,false },
-            //    {true,true,true,false,false,false,false,false,false,false,false,false,false,false,true,false },
-            //    {false,true,true,true,false,false,false,false,false,false,true,false,false,false,false,false },
-            //    {false,false,true,true,true,false,false,false,false,false,false,true,false,false,false,false },
-            //    {true,false,false,true,true,false,false,false,false,false,false,false,true,false,false,false },
-            //    {false,false,false,false,true,false,false,true,false,false,false,true,false,false,true,false },
-            //    {true,false,false,false,false,false,false,false,true,false,true,false,true,false,false,false },
-            //    {false,true,false,false,false,false,false,false,false,true,false,true,false,true,false,false },
-            //    {false,false,true,false,false,true,false,false,false,false,false,false,true,false,true,false },
-            //    {false,false,false,true,false,false,true,false,false,false,true,false,false,true,false,false },
-            //    {true,true,true,true,true,false,false,false,false,false,false,false,false,false,false,false }
-            //};
-            //int n = (int)Math.Sqrt((double)matrix.Length);
-
-            Console.WriteLine("Graph is being colored...");
+                       
             var graph = new UndirectedGraph(n, matrix);
 
             var start = DateTime.Now;
 
-            var colored = graph.GetMISChromaticNumber();
-
-            var time = DateTime.Now - start;
+            var colored = graph.GetMISChromaticNumber();            
         }
 
         [TestMethod]
         public void TestMIS() {
-            bool[,] matrix = new bool[,]
-            {
-                {false,false,false,false,false,true,true,false,false,true,false,true,false,false,false,true },
-                {false,false,false,false,false,true,true,true,false,false,false,false,true,false,false,true },
-                {false,false,false,false,false,false,true,true,true,false,false,false,false,true,false,true },
-                {false,false,false,false,false,false,false,true,true,true,false,false,false,false,true,true },
-                {false,false,false,false,false,true,false,false,true,true,true,false,false,false,false,true },
-                {true,true,false,false,true,false,false,false,false,false,false,false,false,true,false,false },
-                {true,true,true,false,false,false,false,false,false,false,false,false,false,false,true,false },
-                {false,true,true,true,false,false,false,false,false,false,true,false,false,false,false,false },
-                {false,false,true,true,true,false,false,false,false,false,false,true,false,false,false,false },
-                {true,false,false,true,true,false,false,false,false,false,false,false,true,false,false,false },
-                {false,false,false,false,true,false,false,true,false,false,false,true,false,false,true,false },
-                {true,false,false,false,false,false,false,false,true,false,true,false,true,false,false,false },
-                {false,true,false,false,false,false,false,false,false,true,false,true,false,true,false,false },
-                {false,false,true,false,false,true,false,false,false,false,false,false,true,false,true,false },
-                {false,false,false,true,false,false,true,false,false,false,true,false,false,true,false,false },
-                {true,true,true,true,true,false,false,false,false,false,false,false,false,false,false,false }
-            };
-            int n = (int)Math.Sqrt((double)matrix.Length);
+            int n = 35;
+            bool[,] matrix = GraphGenerator.GenerateByDensity(n, 0.5);
+
             var graph = new UndirectedGraph(n, matrix);
-
-            Console.WriteLine("Graph is being colored...");
-
-            var start = DateTime.Now;
-
+            
             var mis = graph.MIS();
-
-            var time = DateTime.Now - start;
         }
 
         [TestMethod]
