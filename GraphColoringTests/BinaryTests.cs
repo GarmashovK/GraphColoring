@@ -36,18 +36,17 @@ namespace GraphColoringTests {
             var binset2 = new BinarySet(len);
 
             binset1[4] = true;
-            binset1[6] = true;
+            binset1[8] = true;
 
             binset2[2] = true;
-            binset2[6] = true;
+            binset2[8] = true;
 
             var result = binset1.Intersect(binset2);
             var tmp = result[6];
 
             Assert.AreEqual(result[2], false);
             Assert.AreEqual(result[4], false);
-            Assert.AreEqual(result[6], true);
-            Assert.AreEqual(result[8], false);
+            Assert.AreEqual(result[8], true);
         }
 
         [TestMethod]
@@ -89,6 +88,19 @@ namespace GraphColoringTests {
 
             var copybinset2 = new BinarySet(binset2);
             list.Remove(copybinset2);
+        }
+
+        [TestMethod]
+        public void TestDelete() {
+            var binset = new BinarySet(10);
+
+            binset[4] = true;
+            binset[5] = true;
+
+            Assert.IsTrue(binset.Count == 2);
+            binset[4] = false;
+
+            Assert.IsTrue(binset.Count == 1);
         }
     }
 }

@@ -4,7 +4,7 @@ using System;
 namespace GraphColoringConsole {
     class Program {
         static void Main(string[] args) {
-            int n = 13;
+            int n = 10;
             bool[,] matrix = GraphGenerator.GenerateByDensity(n, 0.3);
 
             //bool[,] matrix = new bool[,]
@@ -44,15 +44,30 @@ namespace GraphColoringConsole {
             Console.WriteLine();
 
             //------------------------------------
-            Console.WriteLine("Olemskoy alg");
+            //Console.WriteLine("Olemskoy alg");
+
+            //start = DateTime.Now;
+            ////var colored = new OlemskoyColorGraph(matrix);
+            //var olemskoyChromatic = graph.GetOlemskoyChromaticNumber();
+
+            //time = DateTime.Now - start;
+            ////Console.WriteLine(printGraph(colored, n));
+            //Console.WriteLine(graph.OutColoredGraph(olemskoyChromatic));
+            //Console.WriteLine("Time: {0}", time.TotalSeconds);
+            //Console.WriteLine();
+
+            //Console.Read();
+
+            //------------------------------------
+            Console.WriteLine("Olemskoy BinAlg");
 
             start = DateTime.Now;
             //var colored = new OlemskoyColorGraph(matrix);
-            var olemskoyChromatic = graph.GetOlemskoyChromaticNumber();
+            var olemskoyBinChromatic = graph.GetOlemskoyBinChromaticNumber();
 
             time = DateTime.Now - start;
             //Console.WriteLine(printGraph(colored, n));
-            Console.WriteLine(graph.OutColoredGraph(olemskoyChromatic));
+            Console.WriteLine(graph.OutColoredGraph(olemskoyBinChromatic));
             Console.WriteLine("Time: {0}", time.TotalSeconds);
             Console.WriteLine();
 

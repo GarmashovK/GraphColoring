@@ -513,6 +513,12 @@ namespace GraphColoring {
             return olemGraph.ResultColorNodes;
         }
 
+        public List<List<int>> GetOlemskoyBinChromaticNumber() {
+            var olemGraph = new BinaryOlemskoyColorGraph(AdjecencyMatrix, NumOfVertices);
+
+            return olemGraph.Calculate();
+        }
+
         private IList<int> BuildPermutation(List<List<int>> colored) {
             var tmp = new List<int>();
 

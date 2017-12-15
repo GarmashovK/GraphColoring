@@ -91,7 +91,7 @@ namespace GraphColoring.ColorGraph
 
         private bool BlockCheckA(int lenOfMax, int uniLen)
         {
-            var val = (double)tmpColors.Count - 1 + (double)uniLen / lenOfMax;
+            var val = (double)tmpColors.Count + (double)uniLen / lenOfMax;
             return val >= maxColors;
         }
 
@@ -118,25 +118,20 @@ namespace GraphColoring.ColorGraph
         {
             var lvl = curTempSet.Count / 2 + 1;
             var isFirstLvl = curTempSet.Count == 0;
-            var tmpRo = GetRo(variants, null);
-
-            if (curTempSet.Count == 0 &&
-                    uni.Count / tmpRo >= maxColors)
-                return;
-
+                        
             while (variants.SetOfPairs.Count != 0) {
                 var node = variants.SetOfPairs.First();
-                tmpRo = GetRo(variants, node);
+                var tmpRo = GetRo(variants, node);
+                
                 if (isFirstLvl &&
-                    BlockCheckA(tmpRo, uni.Count))
-                    return;
-
-                if (tmpColors.Count == 0 &&
-                BlockCheckB(lvl, node.Set.Count)
-                ||
-                tmpColors.Count + 2 == maxColors &&
-                !BlockCheckC(curTempSet.Count / 2, uni.Count, tmpRo)
-                || isFirstLvl && tmpColors.Count == 0 &&
+                    BlockCheckA(tmpRo, uni.Count)
+                    || tmpColors.Count == 0 &&
+                    (uni.Count / tmpRo >= maxColors || BlockCheckB(lvl, node.Set.Count))
+                    ||
+                    tmpColors.Count + 1 == maxColors &&
+                    !BlockCheckC(curTempSet.Count / 2, uni.Count, tmpRo)
+                    || 
+                    isFirstLvl && tmpColors.Count == 0 &&
                     BlockCheckD(tmpRo))
                     return;
 
@@ -161,6 +156,10 @@ namespace GraphColoring.ColorGraph
         //при ненулевом опорным множеством
         private void BuildEndByCenter(List<int> uni, List<int> curTempSet)
         {
+            if (tmpColors.Count + uni.Count >= maxColors
+                || tmpColors.Count + 1 == maxColors - 1)
+                return;
+
             for (var i = 0; i < uni.Count; i++)
             {
                 var nextTempSet = new List<int>(curTempSet);
@@ -222,9 +221,7 @@ namespace GraphColoring.ColorGraph
         }
 
         private bool BlockCheckD(int ro)
-        {
-            if (tmpColors[0].Count < 2) return false;
-            
+        {            
             var tmp1 = N / ro;
             var tmp2 = (double)N / ro;
             
@@ -245,7 +242,14 @@ namespace GraphColoring.ColorGraph
             var centrElements = new List<int>();
 
             if (curTempSet.Count == 0)
-            {
+            {                
+                if (tmpColors.Count == 1) {
+                    if (checkFirstBlock(tmpColors[0])) {
+                        return;
+                    } else {
+                        watchedFirstBlocks.Add(tmpColors[0]);
+                    }
+                }
                 uni = CreateSupportSet();
             }
             
@@ -283,12 +287,22 @@ namespace GraphColoring.ColorGraph
                 {
                     BuildEndByCenter(uni, curTempSet);
                 }
-
                 lvlVariants.RemoveAt(lvlVariants.Count - 1);
             }
 
             if (IsOver) return;
         }
+
+        private bool checkFirstBlock(List<int> list) {
+            if (watchedFirstBlocks.Count == 0) return false;
+
+            for (var i=0; i<watchedFirstBlocks.Count; i++) {
+                if (watchedFirstBlocks[i].Except(list).Count() == 0)
+                    return true;
+            }
+            return false;
+        }
+
         //создаёт множество возможных продолжений
         private void CreateVariants(List<int> uni, bool newColor)
         {

@@ -36,13 +36,25 @@ namespace GraphColoring.ColorGraph {
         }
 
         public List<List<int>> Calculate() {
-            bestColors = new List<BinarySet>();
-
             Init();
 
             Build(mainSupSet, new BinarySet(N));
+            
+            return GetResult();
+        }
 
-            return new List<List<int>>();
+        private List<List<int>> GetResult() {
+            var result = new List<List<int>>();
+
+            for(var i=0; i<bestColors.Count; i++) {
+                var tmp = new List<int>();
+                for(var j=0; j<N; j++) {
+                    if (bestColors[i][j])
+                        tmp.Add(j);
+                }
+                result.Add(tmp);
+            }
+            return result;
         }
 
         private bool ColoringIsOver() {
@@ -69,9 +81,7 @@ namespace GraphColoring.ColorGraph {
             return 2 * (curLvl - 1) + ro != uniLen;
         }
 
-        private bool BlockCheckD(int ro) {
-            if (tmpColors[0].Count < 2) return false;
-            
+        private bool BlockCheckD(int ro) {            
             var tmp1 = N / ro;
             var tmp2 = (double)N / ro;
 
@@ -90,6 +100,14 @@ namespace GraphColoring.ColorGraph {
         private void Build(BinarySet uni, BinarySet curTempSet) {
 
             if (curTempSet.Count == 0) {
+                if (tmpColors.Count == 1) {
+                    if (checkFirstBlock(tmpColors[0])) {
+                        return;
+                    } else {
+                        watchedFirstBlocks.Add(tmpColors[0]);
+                    }
+                }
+
                 uni = CreateSupportSet();
             }
             
@@ -127,7 +145,22 @@ namespace GraphColoring.ColorGraph {
             lvlColored.RemoveAt(lvlColored.Count - 1);
         }
 
+        private bool checkFirstBlock(BinarySet binarySet) {
+            if (watchedFirstBlocks.Count == 0) return false;
+
+            for (var i=0; i< watchedFirstBlocks.Count; i++) {
+                if (watchedFirstBlocks[i] == binarySet)
+                    return true;
+            }
+
+            return false;
+        }
+
         private void BuildEndByCenter(BinarySet uni, BinarySet curTempSet) {
+            if (tmpColors.Count + uni.Count >= maxColors
+                || tmpColors.Count + 1 == maxColors - 1)
+                return;
+
             var i = 0;
             while (uni.Count != 0) {
                 if (!uni[i]) {
@@ -195,13 +228,10 @@ namespace GraphColoring.ColorGraph {
             if (lastVariants % 2 == 1)
                 lastColorLen++;
 
-            for (var i = lastColorLen; i >= 0; i--) {
+            for (var i = 1; i < lastColorLen; i--) {
                 var phi = GetPhi(i);
                 //удаляем полностью совпадающие ветви
                 lvlVariants[lastVariants - i].Sift(phi);
-            }
-            if (tmpColors.Count == 1) {
-                watchedFirstBlocks.Add(tmpColors[0]);
             }
         }
 
@@ -216,21 +246,26 @@ namespace GraphColoring.ColorGraph {
         }
 
         private void Init() {
+            tmpColors = new List<BinarySet>();
+            bestColors = new List<BinarySet>();
+
             mainSupSet = new BinarySet(N);
             mainSupSet.Invert();
 
             lvlColored = new List<BinarySet>();
             watchedFirstBlocks = new List<BinarySet>();
-
-            CreateVariants(mainSupSet, false);            
+            lvlVariants = new List<BinaryVariants>();
+      
         }
 
         private void CreateVariants(BinarySet uni, bool newColor) {
             BinaryVariants result;
 
-            if (!newColor) {//Если не строится новый цвет то просеиваем из предыдущего
+            if (!newColor) {
+                //Если не строится новый цвет то просеиваем из предыдущего
                 result = lvlVariants.Last().Sieve(uni);
-            } else {//Если новый то тут 2 варианта: либо ещё не строился ни один цвет,
+            } else {
+                //Если новый то тут 2 варианта: либо ещё не строился ни один цвет,
                 //либо уже был построен как минимум один
                 result = lvlVariants.Count != 0 ?
                     lvlVariants.First().Sieve(uni) :
