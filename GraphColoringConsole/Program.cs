@@ -4,8 +4,18 @@ using System;
 namespace GraphColoringConsole {
     class Program {
         static void Main(string[] args) {
-            int n = 10;
-            bool[,] matrix = GraphGenerator.GenerateByDensity(n, 0.3);
+            int n = 20;
+            double density = 0.4;
+
+            Console.WriteLine("Number of vertexes: ");
+            n = int.Parse(Console.ReadLine());
+
+            Console.WriteLine("Density of vertexes(<=1): ");
+            density = double.Parse(Console.ReadLine());
+
+            Console.WriteLine();
+
+            bool[,] matrix = GraphGenerator.GenerateByDensity(n, density);
 
             //bool[,] matrix = new bool[,]
             //{

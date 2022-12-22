@@ -262,7 +262,6 @@ namespace GraphColoring {
                 Q_used.Add(RemoveElems(Q_used[lvl], neighbors));
                 Q_not_used.Add(RemoveElems(Q_not_used[lvl], neighbors));
                 Q_not_used[++lvl].Remove(selected);
-
                 check();
             };
 
@@ -486,7 +485,7 @@ namespace GraphColoring {
             chromaticFunc =
                 (G) => {
                     var all_MIS = G.MIS();
-
+                    all_MIS = all_MIS.OrderBy(x => x.Count).ToList();
                     if (all_MIS.Count == 0) {
                         if (tmp.Count < max) {
                             result = new List<List<int>>(tmp);

@@ -13,7 +13,6 @@ namespace GraphColoring.ColorGraph {
 
         int numBlock;
         int numLevel;
-        bool IsOver = false;
 
         BinarySet mainSupSet;
 
@@ -65,7 +64,8 @@ namespace GraphColoring.ColorGraph {
         }
 
         private BinarySet GetPhi(int s) {                        
-            return tmpColors.Last().Except(lvlColored[s]);
+            return tmpColors.Last()
+                .Except(lvlColored[lvlColored.Count - s - 1]);
         }
 
         private bool BlockCheckA(int lenOfMax, int uniLen) {
@@ -74,7 +74,7 @@ namespace GraphColoring.ColorGraph {
         }
 
         private bool BlockCheckB(int curLvl, int ro) {
-            return 2 * (curLvl - 1) + ro < Math.Round((double)N / maxColors);
+            return 2 * (curLvl - 1) + ro < N / maxColors;
         }
 
         private bool BlockCheckC(int curLvl, int uniLen, int ro) {
@@ -84,8 +84,7 @@ namespace GraphColoring.ColorGraph {
         private bool BlockCheckD(int ro) {            
             var tmp1 = N / ro;
             var tmp2 = (double)N / ro;
-
-
+            
             if (tmp1 == tmp2) {
                 return tmp1 == maxColors;
             } else {
@@ -100,20 +99,21 @@ namespace GraphColoring.ColorGraph {
         private void Build(BinarySet uni, BinarySet curTempSet) {
 
             if (curTempSet.Count == 0) {
-                if (tmpColors.Count == 1) {
-                    if (checkFirstBlock(tmpColors[0])) {
-                        return;
-                    } else {
-                        watchedFirstBlocks.Add(tmpColors[0]);
-                    }
-                }
-
+                
                 uni = CreateSupportSet();
             }
             
             lvlColored.Add(curTempSet);
 
             if (uni.Count == 0) {
+                if (tmpColors.Count == 1) {
+                    if (checkFirstBlock(curTempSet)) {
+                        return;
+                    } else {
+                        watchedFirstBlocks.Add(curTempSet);
+                    }
+                }
+
                 tmpColors.Add(curTempSet);
 
                 Thinning();
@@ -124,11 +124,10 @@ namespace GraphColoring.ColorGraph {
                     if (bestColors.Count == 0 || tmpColors.Count < bestColors.Count) {
                         bestColors = tmpColors.Clone();
                         maxColors = bestColors.Count;
-                        tmpColors.RemoveAt(tmpColors.Count - 1);
                     }
                 }
-                
-                tmpColors.Remove(curTempSet);
+
+                tmpColors.RemoveAt(tmpColors.Count - 1);
             } else {
                 CreateVariants(uni, curTempSet.Count == 0);
 
@@ -182,27 +181,13 @@ namespace GraphColoring.ColorGraph {
         private void BuildNotNullVariants(BinaryVariants variants, BinarySet uni, BinarySet curTempSet) {
             var lvl = curTempSet.Count / 2 + 1;
             var isFirstLvl = curTempSet.Count == 0;            
-
-            if (curTempSet.Count == 0 
-                && variants.Count == 0 &&
-                uni.Count / GetRo(variants, null) >= maxColors)
-                return;
-
+            
             while (variants.SetOfPairs.Count != 0) {
                 var node = variants.SetOfPairs.First();
 
                 var tmpRo = GetRo(variants, node);                  
 
-                if (isFirstLvl &&
-                    BlockCheckA(tmpRo, uni.Count)
-                    ||
-                    tmpColors.Count == 0 &&
-                    BlockCheckB(lvl, node.Set.Count)
-                    ||
-                    tmpColors.Count + 2 == maxColors &&
-                    BlockCheckC(curTempSet.Count / 2, uni.Count, tmpRo)
-                    || isFirstLvl && tmpColors.Count == 0 &&
-                    BlockCheckD(tmpRo))
+                if (checkNextStep(isFirstLvl,tmpRo,uni,node,lvl))
                     return;
 
                 var nextTempSet = new BinarySet(curTempSet);
@@ -219,16 +204,29 @@ namespace GraphColoring.ColorGraph {
             }
         }
 
+        private bool checkNextStep
+            (bool isFirstLvl, int tmpRo,
+            BinarySet uni, BinaryPair node, int lvl) {
+            return isFirstLvl &&
+                    BlockCheckA(tmpRo, uni.Count)
+                    || tmpColors.Count == 0 &&
+                    (uni.Count / tmpRo >= maxColors || BlockCheckB(lvl, node.Set.Count))
+                    ||
+                    lvl + 1 == maxColors &&
+                    BlockCheckC(lvl, uni.Count, tmpRo)
+                    ||
+                    isFirstLvl && tmpColors.Count == 0 &&
+                    BlockCheckD(tmpRo);
+        }
+
         //прореживание
         private void Thinning() {
-            var tmp = tmpColors.Last().Count;
-            var lastColorLen = tmp / 2 - tmp % 2 != 0 ? 1 : 0;
+            var count = tmpColors.Last().Count;
+            var tmp = count % 2 == 1 ? 1 : 0;
+            var lastColorLen = count / 2 + tmp;
             var lastVariants = lvlVariants.Count;
-
-            if (lastVariants % 2 == 1)
-                lastColorLen++;
-
-            for (var i = 1; i < lastColorLen; i--) {
+            
+            for (var i = 1; i <= lastColorLen; i++) {
                 var phi = GetPhi(i);
                 //удаляем полностью совпадающие ветви
                 lvlVariants[lastVariants - i].Sift(phi);

@@ -198,10 +198,11 @@ namespace GraphColoring.ColorGraph
         //прореживание
         private void Thinning()
         {
-            var lastColorLen = tmpColors.Last().Count / 2;
+            var tmp = tmpColors.Last().Count;
+            var lastColorLen = tmp / 2;
             var lastVariants = lvlVariants.Count;
 
-            if (lastVariants % 2 == 1)
+            if (tmp % 2 == 1)
                 lastColorLen++;
 
             for (var i = 1; i < lastColorLen; i++)
