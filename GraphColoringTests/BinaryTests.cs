@@ -102,5 +102,24 @@ namespace GraphColoringTests {
 
             Assert.IsTrue(binset.Count == 1);
         }
+
+        [TestMethod]
+        public void TestExcept() {
+            var len = 10;
+            var binset1 = new BinarySet(len);
+            var binset2 = new BinarySet(len);
+
+            binset1[4] = true;
+            binset1[6] = true;
+
+            binset2[2] = true;
+            binset2[6] = true;
+
+            var tmp = binset1.Except(binset2);
+
+            Assert.IsTrue(tmp[6] == false);
+            Assert.IsTrue(tmp[4] == true);
+            Assert.IsTrue(tmp[2] == false);
+        }
     }
 }
